@@ -23,8 +23,6 @@ class Platform
 
     }
 
-// el :mixed y el :void permite especificar que dato retorna la función
-
     public function getId(): mixed {
         return $this->id;
     }
