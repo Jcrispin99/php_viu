@@ -3,56 +3,81 @@
 require_once __DIR__ . '/../config.php';
 
 class Platform {
-    private $conn;
-    private $table = 'plataformas';
-    
-    public $id;
-    public $nombre;
-    
-    public function __construct() {
-        $database = new Database();
-        $this->conn = $database->connect();
+    private $id;
+    private $name;
+
+    public function __construct($idPlatform, $namePlatform) {
+        $this->id = $idPlatform;
+        $this->name = $namePlatform;
     }
-    
-    // Obtener todas las plataformas
-    public function getAll() {
-        $query = "SELECT * FROM " . $this->table . " ORDER BY id DESC";
-        $stmt = $this->conn->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    public function getId() {
+        return $this->id;
     }
-    
-    // Obtener una plataforma por ID
-    public function getById($id) {
-        $query = "SELECT * FROM " . $this->table . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->execute();
-        return $stmt->fetch(PDO::FETCH_ASSOC);
+
+    public function setId($id) {
+        $this->id = $id;
     }
-    
-    // Crear una nueva plataforma
-    public function create($nombre) {
-        $query = "INSERT INTO " . $this->table . " (nombre) VALUES (:nombre)";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':nombre', $nombre);
-        return $stmt->execute();
+
+    public function getName() {
+        return $this->name;
     }
-    
-    // Actualizar una plataforma
-    public function update($id, $nombre) {
-        $query = "UPDATE " . $this->table . " SET nombre = :nombre WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        $stmt->bindParam(':nombre', $nombre);
-        return $stmt->execute();
+
+    public function setName($name) {
+        $this->name = $name;
     }
-    
-    // Eliminar una plataforma
-    public function delete($id) {
-        $query = "DELETE FROM " . $this->table . " WHERE id = :id";
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':id', $id);
-        return $stmt->execute();
+
+     // Conexión BBDD (ajusta credenciales)
+    private static function connect(): PDO {
+        $host = "localhost";
+        $db   = "viu_php";
+        $user = "root";
+        $pass = "";
+        $dsn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
+
+        $pdo = new PDO($dsn, $user, $pass, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+        ]);
+        return $pdo;
+    }
+// CRUD
+    public static function getAll(): array {
+        $pdo = self::connect();
+        $stmt = $pdo->query("SELECT id, name FROM platforms ORDER BY id DESC");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $platforms = [];
+        foreach ($rows as $row) {
+            $platforms[] = new Platform((int)$row["id"], $row["name"]);
+        }
+        return $platforms;
+    }
+
+    public static function getById(int $id): ?Platform {
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("SELECT id, name FROM platforms WHERE id = :id");
+        $stmt->execute([":id" => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$row) return null;
+        return new Platform((int)$row["id"], $row["name"]);
+    }
+
+    public static function create(string $name): bool {
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("INSERT INTO platforms (name) VALUES (:name)");
+        return $stmt->execute([":name" => $name]);
+    }
+
+    public static function update(int $id, string $name): bool {
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("UPDATE platforms SET name = :name WHERE id = :id");
+        return $stmt->execute([":id" => $id, ":name" => $name]);
+    }
+
+    public static function delete(int $id): bool {
+        $pdo = self::connect();
+        $stmt = $pdo->prepare("DELETE FROM platforms WHERE id = :id");
+        return $stmt->execute([":id" => $id]);
     }
 }
