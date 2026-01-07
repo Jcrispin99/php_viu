@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../models/Platform.php';
+require_once __DIR__ . '/../models/modelPlatform.php';
 
 class PlatformController {
     private $platformModel;
