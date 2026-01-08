@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . "/../../controllers/PlatformController.php";
-$controller = new PlatformController();
 
+$controller = new PlatformController();
 $message = null;
 
 // 1) Cargar plataforma (por GET)
@@ -20,25 +20,33 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["platformId"], $_POST[
     // refrescar nombre en pantalla
     $platform = $controller->getPlatform($pid);
 }
+
+$pageTitle = 'Editar Plataforma';
+
+// Capturar contenido
+ob_start();
 ?>
-<!doctype html>
-<html>
-<head><meta charset="utf-8"><title>Editar plataforma</title></head>
-<body>
-  <h1>Editar plataforma</h1>
+<h1>Editar plataforma</h1>
 
-  <?php if ($message): ?>
-    <p><?= htmlspecialchars($message) ?></p>
-  <?php endif; ?>
+<?php if ($message): ?>
+    <p style="padding: 10px; background: <?= strpos($message, 'ERROR') !== false ? '#ffcccc' : '#ccffcc' ?>; border: 1px solid <?= strpos($message, 'ERROR') !== false ? '#cc0000' : '#00cc00' ?>;">
+        <?= htmlspecialchars($message) ?>
+    </p>
+<?php endif; ?>
 
-  <form action="" method="post">
+<form action="" method="post">
     <input type="hidden" name="platformId" value="<?= htmlspecialchars((string)$platform->getId()) ?>">
-    <label>Nombre:</label>
-    <input type="text" name="platformName" required minlength="2"
-           value="<?= htmlspecialchars($platform->getName()) ?>">
-    <button type="submit">Guardar</button>
-  </form>
-
-  <p><a href="list.php">Volver al listado</a></p>
-</body>
-</html>
+    
+    <div style="margin-bottom: 15px;">
+        <label for="platformName">Nombre:</label><br>
+        <input type="text" id="platformName" name="platformName" required minlength="2" 
+               value="<?= htmlspecialchars($platform->getName()) ?>" 
+               style="width: 300px; padding: 5px;">
+    </div>
+    
+    <button type="submit" style="padding: 8px 15px;">💾 Guardar</button>
+    <a href="list.php" style="margin-left: 10px;">❌ Cancelar</a>
+</form>
+<?php
+$content = ob_get_clean();
+require __DIR__ . '/../layouts/admin.php';

@@ -1,31 +1,25 @@
 <?php
 
-const DB_SERVER = "localhost";
+const DB_SERVER = "127.0.0.1";
 const DB_NAME = "viu_php";
 const DB_USER = "root";
 const DB_PASS = "";
 
-define('BASE_URL', 'http://localhost:8080/');
-
-class Database {
-    private $host = DB_SERVER;
-    private $db_name = DB_NAME;
-    private $username = DB_USER;
-    private $password = DB_PASS;
-    private $conn;
-
-    public function connect() {
-        $this->conn = null;
-        try {
-            $this->conn = new PDO(
-                "mysql:host=" . $this->host . ";dbname=" . $this->db_name,
-                $this->username,
-                $this->password
-            );
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException $e) {
-            echo "Error de conexión: " . $e->getMessage();
-        }
-        return $this->conn;
+/**
+ * Retorna una instancia singleton de PDO
+ * Se conecta solo una vez y reutiliza la misma conexión
+ */
+function coneccion(): PDO {
+    static $pdo = null;
+    
+    if ($pdo === null) {
+        $dsn = "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8mb4";
+        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_EMULATE_PREPARES => false,
+        ]);
     }
+    
+    return $pdo;
 }

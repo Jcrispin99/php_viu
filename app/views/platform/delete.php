@@ -2,22 +2,20 @@
 require_once __DIR__ . "/../../controllers/PlatformController.php";
 $controller = new PlatformController();
 
-// Solo procesar POST
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["id"])) {
-    $id = (int)$_POST["id"];
-    $ok = $controller->deletePlatform($id);
-    
-    if ($ok) {
-        // Redirigir al listado con mensaje de éxito
-        header("Location: list.php?msg=deleted");
-        exit;
-    } else {
-        // Redirigir con error
-        header("Location: list.php?error=delete");
-        exit;
-    }
+if ($_SERVER["REQUEST_METHOD"] !== "POST" || !isset($_POST["id"])) {
+    die("Acceso inválido.");
 }
 
-// Si no es POST, redirigir al listado
-header("Location: list.php");
-exit;
+$id = (int)$_POST["id"];
+$ok = $controller->deletePlatform($id);
+
+?>
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Borrar plataforma</title></head>
+<body>
+  <h1>Borrado</h1>
+  <p><?= $ok ? "OK: Plataforma borrada correctamente." : "ERROR: No se pudo borrar (no existe o relación con otras tablas)." ?></p>
+  <p><a href="list.php">Volver al listado</a></p>
+</body>
+</html>
