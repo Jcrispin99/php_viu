@@ -29,41 +29,41 @@ class Platform {
 
     public static function getAll(): array {
         $pdo = coneccion();
-        $stmt = $pdo->query("SELECT id, name FROM platforms ORDER BY id DESC");
+        $stmt = $pdo->query("SELECT id, nombre FROM plataformas ORDER BY id DESC");
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $platforms = [];
         foreach ($rows as $row) {
-            $platforms[] = new Platform((int)$row["id"], $row["name"]);
+            $platforms[] = new Platform((int)$row["id"], $row["nombre"]);
         }
         return $platforms;
     }
 
     public static function getById(int $id): ?Platform {
         $pdo = coneccion();
-        $stmt = $pdo->prepare("SELECT id, name FROM platforms WHERE id = :id");
+        $stmt = $pdo->prepare("SELECT id, nombre FROM plataformas WHERE id = :id");
         $stmt->execute([":id" => $id]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if (!$row) return null;
-        return new Platform((int)$row["id"], $row["name"]);
+        return new Platform((int)$row["id"], $row["nombre"]);
     }
 
     public static function create(string $name): bool {
         $pdo = coneccion();
-        $stmt = $pdo->prepare("INSERT INTO platforms (name) VALUES (:name)");
-        return $stmt->execute([":name" => $name]);
+        $stmt = $pdo->prepare("INSERT INTO plataformas (nombre) VALUES (:nombre)");
+        return $stmt->execute([":nombre" => $name]);
     }
 
     public static function update(int $id, string $name): bool {
         $pdo = coneccion();
-        $stmt = $pdo->prepare("UPDATE platforms SET name = :name WHERE id = :id");
-        return $stmt->execute([":id" => $id, ":name" => $name]);
+        $stmt = $pdo->prepare("UPDATE plataformas SET nombre = :nombre WHERE id = :id");
+        return $stmt->execute([":id" => $id, ":nombre" => $name]);
     }
 
     public static function delete(int $id): bool {
         $pdo = coneccion();
-        $stmt = $pdo->prepare("DELETE FROM platforms WHERE id = :id");
+        $stmt = $pdo->prepare("DELETE FROM plataformas WHERE id = :id");
         return $stmt->execute([":id" => $id]);
     }
 }
