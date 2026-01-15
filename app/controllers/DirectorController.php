@@ -58,4 +58,16 @@ class DirectorController {
 
         return Director::delete($id);
     }
+
+    /**
+     * Obtiene información de las series que se eliminarán en cascada
+     */
+    public function getRelatedSeriesInfo(int $id): array {
+        if ($id <= 0) return ['count' => 0, 'series' => []];
+        
+        return [
+            'count' => Director::getRelatedSeriesCount($id),
+            'series' => Director::getRelatedSeries($id)
+        ];
+    }
 }

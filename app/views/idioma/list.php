@@ -10,6 +10,14 @@ ob_start();
 ?>
 <h1>Listado de Idiomas</h1>
 
+<?php if (isset($_GET['status'])): ?>
+    <?php if ($_GET['status'] === 'deleted'): ?>
+        <div class="alert alert-success">✅ Idioma eliminado correctamente.</div>
+    <?php elseif ($_GET['status'] === 'error'): ?>
+        <div class="alert alert-danger">❌ Error al eliminar el idioma.</div>
+    <?php endif; ?>
+<?php endif; ?>
+
 <p><a href="create.php">➕ Crear nuevo idioma</a></p>
 
 <?php if (count($idiomas) === 0): ?>
@@ -32,13 +40,7 @@ ob_start();
                 <td><code><?= htmlspecialchars($i->getIsoCode()) ?></code></td>
                 <td>
                     <a href="edit.php?id=<?= urlencode((string)$i->getId()) ?>">✏️ Editar</a>
-                    
-                    <form action="delete.php" method="post" style="display:inline; margin-left: 10px;">
-                        <input type="hidden" name="id" value="<?= htmlspecialchars((string)$i->getId()) ?>">
-                        <button type="submit" onclick="return confirm('¿Seguro que deseas borrar este idioma?')">
-                            🗑️ Borrar
-                        </button>
-                    </form>
+                    <a href="delete.php?id=<?= urlencode((string)$i->getId()) ?>" style="margin-left: 10px; color: #dc3545;">🗑️ Borrar</a>
                 </td>
             </tr>
         <?php endforeach; ?>

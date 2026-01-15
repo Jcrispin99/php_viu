@@ -38,4 +38,16 @@ class PlatformController {
 
         return Platform::delete($id);
     }
+
+    /**
+     * Obtiene información de las series que se eliminarán en cascada
+     */
+    public function getRelatedSeriesInfo(int $id): array {
+        if ($id <= 0) return ['count' => 0, 'series' => []];
+        
+        return [
+            'count' => Platform::getRelatedSeriesCount($id),
+            'series' => Platform::getRelatedSeries($id)
+        ];
+    }
 }

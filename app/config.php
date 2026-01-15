@@ -10,16 +10,16 @@ const DB_PASS = "";
  * Se conecta solo una vez y reutiliza la misma conexión
  */
 function coneccion(): PDO {
-    static $pdo = null;
+    static $mysql = null;
     
-    if ($pdo === null) {
+    if ($mysql == null) {
         $dsn = "mysql:host=" . DB_SERVER . ";dbname=" . DB_NAME . ";charset=utf8mb4";
-        $pdo = new PDO($dsn, DB_USER, DB_PASS, [
+        $mysql = new PDO($dsn, DB_USER, DB_PASS, [
             PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
             PDO::ATTR_EMULATE_PREPARES => false,
         ]);
     }
     
-    return $pdo;
+    return $mysql;
 }

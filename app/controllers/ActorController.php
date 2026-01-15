@@ -58,4 +58,16 @@ class ActorController {
 
         return Actor::delete($id);
     }
+
+    /**
+     * Obtiene información de las series donde participa este actor
+     */
+    public function getRelatedSeriesInfo(int $id): array {
+        if ($id <= 0) return ['count' => 0, 'series' => []];
+        
+        return [
+            'count' => Actor::getRelatedSeriesCount($id),
+            'series' => Actor::getRelatedSeries($id)
+        ];
+    }
 }

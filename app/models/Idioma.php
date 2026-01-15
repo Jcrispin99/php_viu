@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+use function config\coneccion;
 
 class Idioma {
     private $id;
@@ -86,6 +87,44 @@ class Idioma {
             ":nombre" => $nombre,
             ":iso_code" => $isoCode
         ]);
+    }
+
+    /**
+     * Cuenta en cuántas series se usa este idioma (audio + subtítulos)
+     */
+    public static function getRelatedSeriesCount(int $id): int {
+        $pdo = coneccion();
+        // Contar series únicas que usan este idioma en audio O subtítulos
+        $stmt = $pdo->prepare("
+            SELECT COUNT(DISTINCT serie_id) as total FROM (
+                SELECT serie_id FROM series_idiomas_audio WHERE idioma_id = :id
+                UNION
+                SELECT serie_id FROM series_idiomas_subtitulos WHERE idioma_id = :id
+            ) as combined
+        ");
+        $stmt->execute([":id" => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$row['total'];
+    }
+
+    /**
+     * Obtiene las series que usan este idioma con detalle de uso
+     */
+    public static function getRelatedSeries(int $id): array {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("
+            SELECT s.id, s.titulo, 
+                   (SELECT COUNT(*) FROM series_idiomas_audio WHERE serie_id = s.id AND idioma_id = :id) > 0 as en_audio,
+                   (SELECT COUNT(*) FROM series_idiomas_subtitulos WHERE serie_id = s.id AND idioma_id = :id) > 0 as en_subtitulos
+            FROM series s
+            WHERE s.id IN (
+                SELECT serie_id FROM series_idiomas_audio WHERE idioma_id = :id2
+                UNION
+                SELECT serie_id FROM series_idiomas_subtitulos WHERE idioma_id = :id3
+            )
+        ");
+        $stmt->execute([":id" => $id, ":id2" => $id, ":id3" => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function delete(int $id): bool {

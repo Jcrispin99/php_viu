@@ -61,6 +61,27 @@ class Platform {
         return $stmt->execute([":id" => $id, ":nombre" => $name]);
     }
 
+    /**
+     * Cuenta cuántas series están asociadas a esta plataforma
+     */
+    public static function getRelatedSeriesCount(int $id): int {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM series WHERE plataforma_id = :id");
+        $stmt->execute([":id" => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$row['total'];
+    }
+
+    /**
+     * Obtiene los títulos de las series asociadas a esta plataforma
+     */
+    public static function getRelatedSeries(int $id): array {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("SELECT id, titulo FROM series WHERE plataforma_id = :id");
+        $stmt->execute([":id" => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public static function delete(int $id): bool {
         $pdo = coneccion();
         $stmt = $pdo->prepare("DELETE FROM plataformas WHERE id = :id");

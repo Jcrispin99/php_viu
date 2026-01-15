@@ -10,6 +10,14 @@ ob_start();
 ?>
 <h1>Listado de plataformas</h1>
 
+<?php if (isset($_GET['status'])): ?>
+    <?php if ($_GET['status'] === 'deleted'): ?>
+        <div class="alert alert-success">✅ Plataforma eliminada correctamente.</div>
+    <?php elseif ($_GET['status'] === 'error'): ?>
+        <div class="alert alert-danger">❌ Error al eliminar la plataforma.</div>
+    <?php endif; ?>
+<?php endif; ?>
+
 <p><a href="create.php">➕ Crear nueva plataforma</a></p>
 
 <?php if (count($platforms) === 0): ?>
@@ -30,13 +38,7 @@ ob_start();
                 <td><?= htmlspecialchars($p->getName()) ?></td>
                 <td>
                     <a href="edit.php?id=<?= urlencode((string)$p->getId()) ?>">✏️ Editar</a>
-                    
-                    <form action="delete.php" method="post" style="display:inline; margin-left: 10px;">
-                        <input type="hidden" name="id" value="<?= htmlspecialchars((string)$p->getId()) ?>">
-                        <button type="submit" onclick="return confirm('¿Seguro que deseas borrar esta plataforma?')">
-                            🗑️ Borrar
-                        </button>
-                    </form>
+                    <a href="delete.php?id=<?= urlencode((string)$p->getId()) ?>" style="margin-left: 10px; color: #dc3545;">🗑️ Borrar</a>
                 </td>
             </tr>
         <?php endforeach; ?>

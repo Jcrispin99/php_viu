@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+use function config\coneccion;
 
 class Director {
     private $id;
@@ -114,6 +115,27 @@ class Director {
             ":fecha_nacimiento" => $fechaNacimiento,
             ":nacionalidad" => $nacionalidad
         ]);
+    }
+
+    /**
+     * Cuenta cuántas series están asociadas a este director
+     */
+    public static function getRelatedSeriesCount(int $id): int {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM series WHERE director_id = :id");
+        $stmt->execute([":id" => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$row['total'];
+    }
+
+    /**
+     * Obtiene los títulos de las series asociadas a este director
+     */
+    public static function getRelatedSeries(int $id): array {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("SELECT id, titulo FROM series WHERE director_id = :id");
+        $stmt->execute([":id" => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function delete(int $id): bool {

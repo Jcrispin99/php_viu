@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../config.php';
+use function config\coneccion;
 
 class Actor {
     private $id;
@@ -114,6 +115,32 @@ class Actor {
             ":fecha_nacimiento" => $fechaNacimiento,
             ":nacionalidad" => $nacionalidad
         ]);
+    }
+
+    /**
+     * Cuenta en cuántas series participa este actor
+     */
+    public static function getRelatedSeriesCount(int $id): int {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("SELECT COUNT(*) as total FROM series_actores WHERE actor_id = :id");
+        $stmt->execute([":id" => $id]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return (int)$row['total'];
+    }
+
+    /**
+     * Obtiene los títulos de las series donde participa este actor
+     */
+    public static function getRelatedSeries(int $id): array {
+        $pdo = coneccion();
+        $stmt = $pdo->prepare("
+            SELECT s.id, s.titulo 
+            FROM series s 
+            INNER JOIN series_actores sa ON s.id = sa.serie_id 
+            WHERE sa.actor_id = :id
+        ");
+        $stmt->execute([":id" => $id]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     public static function delete(int $id): bool {

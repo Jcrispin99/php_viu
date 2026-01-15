@@ -10,6 +10,14 @@ ob_start();
 ?>
 <h1>Listado de Directores</h1>
 
+<?php if (isset($_GET['status'])): ?>
+    <?php if ($_GET['status'] === 'deleted'): ?>
+        <div class="alert alert-success">✅ Director eliminado correctamente.</div>
+    <?php elseif ($_GET['status'] === 'error'): ?>
+        <div class="alert alert-danger">❌ Error al eliminar el director.</div>
+    <?php endif; ?>
+<?php endif; ?>
+
 <p><a href="create.php">➕ Crear nuevo director</a></p>
 
 <?php if (count($directores) === 0): ?>
@@ -36,13 +44,7 @@ ob_start();
                 <td><?= htmlspecialchars($a->getNacionalidad()) ?></td>
                 <td>
                     <a href="edit.php?id=<?= urlencode((string)$a->getId()) ?>">✏️ Editar</a>
-                    
-                    <form action="delete.php" method="post" style="display:inline; margin-left: 10px;">
-                        <input type="hidden" name="id" value="<?= htmlspecialchars((string)$a->getId()) ?>">
-                        <button type="submit" onclick="return confirm('¿Seguro que deseas borrar este director?')">
-                            🗑️ Borrar
-                        </button>
-                    </form>
+                    <a href="delete.php?id=<?= urlencode((string)$a->getId()) ?>" style="margin-left: 10px; color: #dc3545;">🗑️ Borrar</a>
                 </td>
             </tr>
         <?php endforeach; ?>

@@ -56,4 +56,16 @@ class IdiomaController {
 
         return Idioma::delete($id);
     }
+
+    /**
+     * Obtiene información de las series que usan este idioma
+     */
+    public function getRelatedSeriesInfo(int $id): array {
+        if ($id <= 0) return ['count' => 0, 'series' => []];
+        
+        return [
+            'count' => Idioma::getRelatedSeriesCount($id),
+            'series' => Idioma::getRelatedSeries($id)
+        ];
+    }
 }
