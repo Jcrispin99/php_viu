@@ -13,6 +13,9 @@
             <nav>
                 <ul style="list-style: none; padding: 0;">
                     <li style="margin-bottom: 10px;">
+                        <a href="/">🏠 Inicio</a>
+                    </li>
+                    <li style="margin-bottom: 10px;">
                         <a href="/app/views/platform/list.php">📋 Plataformas</a>
                     </li>
                     <li style="margin-bottom: 10px;">
