@@ -6,52 +6,64 @@ class Serie {
     private $titulo;
     private $plataformaId;
     private $directorId;
+    private $plataformaNombre;
+    private $directorNombre;
+    private $actoresNombres; // String separado por comas
 
-    public function __construct($id, $titulo, $plataformaId, $directorId) {
+    public function __construct($id, $titulo, $plataformaId, $directorId, $plataformaNombre = null, $directorNombre = null, $actoresNombres = null) {
         $this->id = $id;
         $this->titulo = $titulo;
         $this->plataformaId = $plataformaId;
         $this->directorId = $directorId;
+        $this->plataformaNombre = $plataformaNombre;
+        $this->directorNombre = $directorNombre;
+        $this->actoresNombres = $actoresNombres;
     }
 
+    // Getters existing... adding new ones
+    public function getPlataformaNombre() { return $this->plataformaNombre; }
+    public function getDirectorNombre() { return $this->directorNombre; }
+    public function getActoresNombres() { return $this->actoresNombres; }
+
+    // ... existing getters for ids/titles ... (kept implicitly by not replacing them, but I need to be careful with the replacement range)
+
+    // Re-declaring standard getters for context if needed, but I'll try to just act on the block efficiently.
+    // Actually, to be safe and clean, I will replace the top part of the class including properties and constructor.
+    
     // Getters
-    public function getId() {
-        return $this->id;
-    }
-
-    public function getTitulo() {
-        return $this->titulo;
-    }
-
-    public function getPlataformaId() {
-        return $this->plataformaId;
-    }
-
-    public function getDirectorId() {
-        return $this->directorId;
-    }
+    public function getId() { return $this->id; }
+    public function getTitulo() { return $this->titulo; }
+    public function getPlataformaId() { return $this->plataformaId; }
+    public function getDirectorId() { return $this->directorId; }
 
     // Setters
-    public function setId($id) {
-        $this->id = $id;
-    }
-
-    public function setTitulo($titulo) {
-        $this->titulo = $titulo;
-    }
-
-    public function setPlataformaId($plataformaId) {
-        $this->plataformaId = $plataformaId;
-    }
-
-    public function setDirectorId($directorId) {
-        $this->directorId = $directorId;
-    }
+    public function setId($id) { $this->id = $id; }
+    public function setTitulo($titulo) { $this->titulo = $titulo; }
+    public function setPlataformaId($plataformaId) { $this->plataformaId = $plataformaId; }
+    public function setDirectorId($directorId) { $this->directorId = $directorId; }
+    
+    public function setPlataformaNombre($nombre) { $this->plataformaNombre = $nombre; }
+    public function setDirectorNombre($nombre) { $this->directorNombre = $nombre; }
+    public function setActoresNombres($nombres) { $this->actoresNombres = $nombres; }
 
     // CRUD - Usando conexión centralizada de config.php
     public static function getAll(): array {
         $pdo = coneccion();
-        $stmt = $pdo->query("SELECT id, titulo, plataforma_id, director_id FROM series ORDER BY id DESC");
+        // Query mejorada con JOINS
+        $sql = "SELECT 
+                    s.id, s.titulo, s.plataforma_id, s.director_id,
+                    p.nombre AS plataforma_nombre,
+                    CONCAT(d.nombre, ' ', d.apellidos) AS director_nombre,
+                    GROUP_CONCAT(CONCAT(a.nombre, ' ', a.apellidos) SEPARATOR ', ') AS actores_nombres
+                FROM series s
+                LEFT JOIN plataformas p ON s.plataforma_id = p.id
+                LEFT JOIN directores d ON s.director_id = d.id
+                LEFT JOIN series_actores sa ON s.id = sa.serie_id
+                LEFT JOIN actores a ON sa.actor_id = a.id
+                GROUP BY s.id, s.titulo, s.plataforma_id, s.director_id, p.nombre, d.nombre, d.apellidos
+                ORDER BY s.id DESC";
+                
+        $stmt = $pdo->query($sql);
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $series = [];
@@ -60,7 +72,10 @@ class Serie {
                 (int)$row["id"],
                 $row["titulo"],
                 (int)$row["plataforma_id"],
-                (int)$row["director_id"]
+                (int)$row["director_id"],
+                $row["plataforma_nombre"],
+                $row["director_nombre"],
+                $row["actores_nombres"]                 
             );
         }
         return $series;

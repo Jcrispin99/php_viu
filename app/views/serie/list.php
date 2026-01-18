@@ -20,8 +20,9 @@ ob_start();
             <tr style="background: #f0f0f0;">
                 <th>ID</th>
                 <th>Título</th>
-                <th>Plataforma ID</th>
-                <th>Director ID</th>
+                <th>Plataforma</th>
+                <th>Director</th>
+                <th>Actores</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -30,8 +31,9 @@ ob_start();
             <tr>
                 <td><?= htmlspecialchars((string)$s->getId()) ?></td>
                 <td><?= htmlspecialchars($s->getTitulo()) ?></td>
-                <td><?= htmlspecialchars((string)$s->getPlataformaId()) ?></td>
-                <td><?= htmlspecialchars((string)$s->getDirectorId()) ?></td>
+                <td><?= htmlspecialchars($s->getPlataformaNombre() ?? 'Sin plataforma') ?></td>
+                <td><?= htmlspecialchars($s->getDirectorNombre() ?? 'Sin director') ?></td>
+                <td><?= htmlspecialchars($s->getActoresNombres() ?? 'Sin actores') ?></td>
                 <td>
                     <a href="edit.php?id=<?= urlencode((string)$s->getId()) ?>">✏️ Editar</a>
                     
